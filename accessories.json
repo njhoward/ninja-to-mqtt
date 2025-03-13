@@ -1,0 +1,128 @@
+"accessories": [
+        {
+            "accessory": "mqttthing",
+            "type": "temperatureSensor",
+            "name": "Ninja Onboard Temperature",
+            "topics": {
+                "getCurrentTemperature": "ninjaCape/input/1"
+            },
+            "category": "SENSOR"
+        },
+        {
+            "accessory": "mqttthing",
+            "type": "temperatureSensor",
+            "name": "Ninja External Temperature",
+            "topics": {
+                "getCurrentTemperature": "ninjaCape/input/31"
+            },
+            "category": "SENSOR"
+        },
+        {
+            "accessory": "mqttthing",
+            "type": "humiditySensor",
+            "name": "Ninja External Humidity",
+            "topics": {
+                "getCurrentRelativeHumidity": "ninjaCape/input/30"
+            },
+            "category": "SENSOR"
+        },
+        {
+            "accessory": "mqttthing",
+            "type": "lightbulb",
+            "name": "Ninja Status",
+            "topics": {
+                "getOn": "ninjaCape/input/999",
+                "setOn": "ninjaCape/output/999",
+                "getRGB": "ninjaCape/input/999",
+                "setRGB": "ninjaCape/output/999"
+            },
+            "onValue": "0000FF",
+            "offValue": "000000",
+            "switchColors": [
+                {
+                    "value": "FF0000",
+                    "label": "Red"
+                },
+                {
+                    "value": "FFFF00",
+                    "label": "Yellow"
+                },
+                {
+                    "value": "00FF00",
+                    "label": "Green"
+                },
+                {
+                    "value": "0000FF",
+                    "label": "Blue"
+                },
+                {
+                    "value": "FF00FF",
+                    "label": "Magenta"
+                },
+                {
+                    "value": "00FFFF",
+                    "label": "Cyan"
+                },
+                {
+                    "value": "000000",
+                    "label": "Off"
+                }
+            ],
+            "onlineValue": "online"
+        },
+        {
+            "accessory": "mqttthing",
+            "type": "lightbulb",
+            "name": "Ninja Eyes",
+            "topics": {
+                "getOn": "ninjaCape/input/1007",
+                "setOn": "ninjaCape/output/1007",
+                "getRGB": "ninjaCape/input/1007",
+                "setRGB": "ninjaCape/output/1007"
+            },
+            "onValue": "0000FF",
+            "offValue": "000000",
+            "switchColors": [
+                {
+                    "value": "FF0000",
+                    "label": "Red"
+                },
+                {
+                    "value": "FFFF00",
+                    "label": "Yellow"
+                },
+                {
+                    "value": "00FF00",
+                    "label": "Green"
+                },
+                {
+                    "value": "0000FF",
+                    "label": "Blue"
+                },
+                {
+                    "value": "FF00FF",
+                    "label": "Magenta"
+                },
+                {
+                    "value": "00FFFF",
+                    "label": "Cyan"
+                },
+                {
+                    "value": "000000",
+                    "label": "Off"
+                }
+            ],
+            "onlineValue": "online"
+        },
+        {
+            "accessory": "mqttthing",
+            "type": "switch",
+            "name": "Ninja Transmitter Test",
+            "topics": {
+                "setOn": "ninjaCape/output/8888"
+            },
+            "onValue": "1",
+            "offValue": "0",
+            "integerValue": true
+        }
+    ]
