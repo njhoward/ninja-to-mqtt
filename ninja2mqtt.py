@@ -79,14 +79,23 @@ def process_ninjacape_messages():
     logging.info("Listening for NinjaCape messages...")
     while True:
         try:
-            raw_data = ser.readline().decode('utf-8').strip()
+            raw_data = ser.readline()
             if not raw_data:
                 continue
             
-            logging.debug(f"Received serial data: {raw_data}")
-            data = json.loads(raw_data)
-
-            if "DEVICE" in data:
+            try:
+                line = raw_data.decode('utf-8').strip()
+                logging.debug(f"Received serial data: {line}")
+            except UnicodeDecodeError:
+                logging.warning(f"Received non-UTF-8 data: {raw_data}")
+                continue
+            
+            try:
+                data = json.loads(line)
+                if "DEVICE" not in data:
+                    logging.warning(f"Unknown data format received: {line}")
+                    continue
+                
                 device = data["DEVICE"][0]
                 dev_id = str(device["D"])
                 dev_value = str(device["DA"])
@@ -95,8 +104,11 @@ def process_ninjacape_messages():
                 mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value, qos=0, retain=True)
                 logging.info(f"Published sensor {dev_id} -> {dev_value}")
 
-        except json.JSONDecodeError as e:
-            logging.warning(f"Invalid JSON received from serial: {raw_data}")
+            except json.JSONDecodeError:
+                logging.warning(f"Invalid JSON received from serial: {line}")
+            except KeyError as e:
+                logging.warning(f"Missing key {e} in received data: {line}")
+
         except Exception as e:
             logging.error(f"Error processing serial data: {e}")
 
