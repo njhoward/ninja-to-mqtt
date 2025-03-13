@@ -124,7 +124,7 @@ def process_ninjacape_messages():
                     dev_id = str(device["D"])
                     dev_value = str(device["DA"])
 
-                    if dev_value in {"999", "1007"}:
+                    if device in {"999", "1007"}:
                         dev_moderated_value = hex_to_tuple(dev_value)
                     else:
                         dev_moderated_value = dev_value
