@@ -124,11 +124,13 @@ def process_ninjacape_messages():
                     dev_id = str(device["D"])
                     dev_value = str(device["DA"])
 
+                    logging.info(f"prior")
                     if dev_id in {"999", "1007"}:
                         dev_moderated_value = hex_to_tuple(dev_value)
                     else:
                         dev_moderated_value = dev_value
-
+                    logging.info(f"later")
+                    
                     # Publish received sensor data to MQTT
                     mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_moderated_value, qos=0, retain=True)
                     logging.info(f"Published sensor {dev_id} -> {dev_moderated_value}")
