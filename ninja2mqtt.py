@@ -42,6 +42,18 @@ def hex_to_tuple(value):
         return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
     return value  # Return original value if not a valid hex color
 
+def hex_to_rgb_string(hex_color):
+    """Convert hex color (e.g., '00FF00') to 'R,G,B' string (e.g., '0,255,0').
+       If not a valid hex RGB, return the original value unchanged.
+    """
+    if re.fullmatch(r'^[0-9A-Fa-f]{6}$', hex_color):
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        return f"{r},{g},{b}"
+    return hex_color  # Return the original value if not valid hex RGB
+
+
 
 # MQTT Callbacks
 def on_connect(client, userdata, flags, rc):
@@ -126,7 +138,7 @@ def process_ninjacape_messages():
 
                     #logging.info(f"prior")
                     if str(dev_id) in {"999", "1007"}:
-                        dev_moderated_value = hex_to_tuple(dev_value)
+                        dev_moderated_value = hex_to_rgb_string(dev_value)
                     else:
                         dev_moderated_value = dev_value
                     #logging.info(f"later")
