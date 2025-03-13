@@ -92,17 +92,21 @@ def process_ninjacape_messages():
             
             try:
                 data = json.loads(line)
-                if "DEVICE" not in data:
-                    logging.warning(f"Unknown data format received: {line}")
-                    continue
                 
-                device = data["DEVICE"][0]
-                dev_id = str(device["D"])
-                dev_value = str(device["DA"])
+                if "ACK" in data:
+                    logging.info(f"Acknowledgment received: {data}")
+                    continue  # ACK messages are just acknowledgments, no action needed
+                
+                if "DEVICE" in data:
+                    device = data["DEVICE"][0]
+                    dev_id = str(device["D"])
+                    dev_value = str(device["DA"])
 
-                # Publish received sensor data to MQTT
-                mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value, qos=0, retain=True)
-                logging.info(f"Published sensor {dev_id} -> {dev_value}")
+                    # Publish received sensor data to MQTT
+                    mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value, qos=0, retain=True)
+                    logging.info(f"Published sensor {dev_id} -> {dev_value}")
+                else:
+                    logging.warning(f"Unknown data format received: {line}")
 
             except json.JSONDecodeError:
                 logging.warning(f"Invalid JSON received from serial: {line}")
