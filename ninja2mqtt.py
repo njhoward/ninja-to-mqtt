@@ -39,7 +39,19 @@ def on_message(client, userdata, msg):
     # Extract device ID from topic
     try:
         device_id = msg.topic.split("/")[-1]
-        command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": payload}]})
+        
+        # Convert RGB tuple (48,79,255) into hex string ("304FFF")
+        if "," in payload:
+            try:
+                rgb_values = [int(x) for x in payload.split(",")]
+                hex_value = "{:02X}{:02X}{:02X}".format(*rgb_values)
+            except ValueError:
+                logging.error(f"Invalid RGB value received: {payload}")
+                return
+        else:
+            hex_value = payload  # Assume already in hex format
+
+        command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": hex_value}]})
         
         # Send command to NinjaCape via Serial
         ser.write((command + "\n").encode('utf-8'))
