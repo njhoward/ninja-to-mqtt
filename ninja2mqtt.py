@@ -1,4 +1,5 @@
 import serial
+import re
 import json
 import time
 import paho.mqtt.client as mqtt
@@ -24,6 +25,24 @@ except Exception as e:
     logging.error(f"Could not open serial port {SERIAL_PORT}: {e}")
     exit(1)
 
+#helper functions
+def convert_to_hex(value):
+    if "," in value:
+        try:
+            rgb_values = [int(x) for x in value.split(",")]
+            return "{:02X}{:02X}{:02X}".format(*rgb_values)
+        except ValueError:
+            logging.error(f"Invalid RGB tuple received: {value}")
+            return None
+    return value  # Already hex
+
+def hex_to_tuple(value):
+    # Check if value is a valid 6-character hex color
+    if re.fullmatch(r'^[0-9A-Fa-f]{6}$', value):
+        return tuple(int(value[i:i+2], 16) for i in (0, 2, 4))
+    return value  # Return original value if not a valid hex color
+
+
 # MQTT Callbacks
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
@@ -41,17 +60,20 @@ def on_message(client, userdata, msg):
         device_id = msg.topic.split("/")[-1]
         
         # Convert RGB tuple (48,79,255) into hex string ("304FFF")
-        if "," in payload:
-            try:
-                rgb_values = [int(x) for x in payload.split(",")]
-                hex_value = "{:02X}{:02X}{:02X}".format(*rgb_values)
-            except ValueError:
-                logging.error(f"Invalid RGB value received: {payload}")
-                return
-        else:
-            hex_value = payload  # Assume already in hex format
+        #/* if "," in payload:
+        #    try:
+        #        rgb_values = [int(x) for x in payload.split(",")]
+        #        hex_value = "{:02X}{:02X}{:02X}".format(*rgb_values)
+        #    except ValueError:
+        #        logging.error(f"Invalid RGB value received: {payload}")
+        #        return
+        #else:
+        #    hex_value = payload  # Assume already in hex format 
 
-        command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": hex_value}]})
+
+        #convert to hex if tuple
+        moderated_send_value = convert_to_hex(payload)
+        command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated_send_value)}]})
         
         # Send command to NinjaCape via Serial
         ser.write((command + "\n").encode('utf-8'))
@@ -102,9 +124,14 @@ def process_ninjacape_messages():
                     dev_id = str(device["D"])
                     dev_value = str(device["DA"])
 
+                    if dev_value in {"999", "1007"}:
+                        dev_moderated_value = hex_to_tuple(dev_value)
+                    else:
+                        dev_moderated_value = dev_value
+
                     # Publish received sensor data to MQTT
-                    mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value, qos=0, retain=True)
-                    logging.info(f"Published sensor {dev_id} -> {dev_value}")
+                    mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_moderated_value, qos=0, retain=True)
+                    logging.info(f"Published sensor {dev_id} -> {dev_moderated_value}")
                 else:
                     logging.warning(f"Unknown data format received: {line}")
 
