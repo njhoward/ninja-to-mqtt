@@ -13,7 +13,7 @@ MQTT_PORT = 1883
 SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
 
 # Logging Setup
-logging.basicConfig(filename='/var/log/ninja2mqtt.log', level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(filename='/home/debian/logs/ninja2mqtt.log', level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
 
 logging.info("Starting NinjaCape MQTT Bridge")
 
