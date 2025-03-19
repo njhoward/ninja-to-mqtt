@@ -13,7 +13,7 @@ MQTT_PORT = 1883
 SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
 
 # Logging Setup
-logging.basicConfig(filename='/home/debian/logs/ninja2mqtt.log', level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(filename='/home/debian/logs/ninja2mqtt.log', level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 logging.info("Starting NinjaCape MQTT Bridge")
 
@@ -65,7 +65,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     payload = msg.payload.decode()
-    logging.debug(f"Received MQTT message: {msg.topic} -> {payload}")
+    logging.info(f"Received MQTT message: {msg.topic} -> {payload}")
 
     # Extract device ID from topic
     try:
@@ -126,11 +126,12 @@ def process_ninjacape_messages():
             
             try:
                 data = json.loads(line)
-                
+
+
                 if "ACK" in data:
                     logging.info(f"Acknowledgment received: {data}")
                     continue  # ACK messages are just acknowledgments, no action needed
-                
+              
                 if "DEVICE" in data:
                     device = data["DEVICE"][0]
                     dev_id = str(device["D"])
@@ -141,11 +142,16 @@ def process_ninjacape_messages():
                         dev_moderated_value = hex_to_rgb_string(dev_value)
                     else:
                         dev_moderated_value = dev_value
+                        logging.info(f"Received non-LED serial data: {line}")
                     #logging.info(f"later")
 
                     # Publish received sensor data to MQTT
                     mqtt_client.publish(f"ninjaCape/input/{dev_id}", str(dev_moderated_value), qos=0, retain=True)
-                    logging.info(f"Published sensor {dev_id} -> {dev_moderated_value}")
+
+                    if str(dev_id) in {"999", "1007"}:
+                        logging.debug(f"Published LED sensor {dev_id} -> {dev_moderated_value}")
+                    else:
+                        logging.info(f"Published sensor {dev_id} -> {dev_moderated_value}")
                 else:
                     logging.warning(f"Unknown data format received: {line}")
 
