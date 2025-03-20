@@ -43,7 +43,7 @@ except Exception as e:
 def send_pushover_notification(message):
     """Send a notification to iPhone using Pushover, if credentials are available."""
     if not PUSHOVER_USER_KEY or not PUSHOVER_API_TOKEN:
-        print("Pushover environment variables not set. Skipping notification.")
+        logging.error("Pushover environment variables not set. Skipping notification.")
         return
 
     url = "https://api.pushover.net/1/messages.json"
@@ -57,7 +57,7 @@ def send_pushover_notification(message):
         response = requests.post(url, data=payload)
         response.raise_for_status()
     except requests.exceptions.RequestException as e:
-        print(f"Error sending notification: {e}")
+        logging.error(f"Error sending notification: {e}")
 
 def convert_to_hex(value):
     if "," in value:
