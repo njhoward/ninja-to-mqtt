@@ -6,6 +6,7 @@ import paho.mqtt.client as mqtt
 import logging
 import logging.config
 import os
+import requests
 
 # Configuration
 SERIAL_PORT = "/dev/ttyS1"
@@ -13,6 +14,11 @@ BAUD_RATE = 9600
 MQTT_BROKER = "raspberrypi"
 MQTT_PORT = 1883
 SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
+
+# PUSHOVER config - retrieved from environment varables
+PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY")
+PUSHOVER_API_TOKEN = os.getenv("PUSHOVER_API_TOKEN")
+
 
 # Logging Setup
 # Load logging config from external file
@@ -33,6 +39,26 @@ except Exception as e:
     exit(1)
 
 #helper functions
+
+def send_pushover_notification(message):
+    """Send a notification to iPhone using Pushover, if credentials are available."""
+    if not PUSHOVER_USER_KEY or not PUSHOVER_API_TOKEN:
+        print("Pushover environment variables not set. Skipping notification.")
+        return
+
+    url = "https://api.pushover.net/1/messages.json"
+    payload = {
+        "token": PUSHOVER_API_TOKEN,
+        "user": PUSHOVER_USER_KEY,
+        "message": message,
+        "title": "NinjaCape Alert"
+    }
+    try:
+        response = requests.post(url, data=payload)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending notification: {e}")
+
 def convert_to_hex(value):
     if "," in value:
         try:
@@ -89,17 +115,20 @@ def on_message(client, userdata, msg):
         #else:
         #    hex_value = payload  # Assume already in hex format 
 
-
-        #convert to hex if tuple
+         #convert to hex if tuple
         moderated_send_value = convert_to_hex(payload)
         command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated_send_value)}]})
-        
+
+        if int(device_id) == 674:
+            send_pushover_notification(f"Message from device 674 received: {str(moderated_send_value)}")
+
         # Send command to NinjaCape via Serial
         ser.write((command + "\n").encode('utf-8'))
         logging.info(f"Sent to NinjaCape: {command}")
 
     except Exception as e:
         logging.error(f"Failed to process MQTT message: {e}")
+        send_pushover_notification(f"Failed to process MQTT message: {e}")
 
 # Initialize MQTT Client
 mqtt_client = mqtt.Client(client_id="beaglebone-ninja")
@@ -129,6 +158,7 @@ def process_ninjacape_messages():
                 logging.debug(f"Received serial data: {line}")
             except UnicodeDecodeError:
                 logging.warning(f"Received non-UTF-8 data: {raw_data}")
+                send_pushover_notification(f"Received non-UTF-8 data: {raw_data}")
                 continue
             
             try:
@@ -159,15 +189,20 @@ def process_ninjacape_messages():
                         logging.debug(f"Published LED sensor {dev_id} -> {dev_moderated_value}")
                     else:
                         logging.info(f"Published sensor {dev_id} -> {dev_moderated_value}")
+                        send_pushover_notification(f"Published sensor {dev_id} -> {dev_moderated_value}")
                 else:
                     logging.warning(f"Unknown data format received: {line}")
+                    send_pushover_notification(f"Unknown data format received: {line}")
 
             except json.JSONDecodeError:
                 logging.warning(f"Invalid JSON received from serial: {line}")
+                send_pushover_notification(f"Invalid JSON received from serial: {line}")
             except KeyError as e:
                 logging.warning(f"Missing key {e} in received data: {line}")
+                send_pushover_notification(f"Missing key {e} in received data: {line}")
 
         except Exception as e:
             logging.error(f"Error processing serial data: {e}")
+            send_pushover_notification(f"Error processing serial data: {e}")
 
 process_ninjacape_messages()
