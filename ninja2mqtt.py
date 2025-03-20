@@ -121,6 +121,7 @@ def on_message(client, userdata, msg):
 
         if int(device_id) == 674:
             send_pushover_notification(f"Message from device 674 received: {str(moderated_send_value)}")
+            logging.info(f"Message from device 674 received: {str(moderated_send_value)}")
 
         # Send command to NinjaCape via Serial
         ser.write((command + "\n").encode('utf-8'))
