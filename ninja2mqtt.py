@@ -104,17 +104,6 @@ def on_message(client, userdata, msg):
     try:
         device_id = msg.topic.split("/")[-1]
         
-        # Convert RGB tuple (48,79,255) into hex string ("304FFF")
-        #/* if "," in payload:
-        #    try:
-        #        rgb_values = [int(x) for x in payload.split(",")]
-        #        hex_value = "{:02X}{:02X}{:02X}".format(*rgb_values)
-        #    except ValueError:
-        #        logging.error(f"Invalid RGB value received: {payload}")
-        #        return
-        #else:
-        #    hex_value = payload  # Assume already in hex format 
-
          #convert to hex if tuple
         moderated_send_value = convert_to_hex(payload)
         command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated_send_value)}]})
