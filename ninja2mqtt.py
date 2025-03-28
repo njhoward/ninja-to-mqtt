@@ -40,7 +40,7 @@ try:
             "G": "0",
             "V": 0,
             "D": 33,
-            "DA": 1  # Send as an integer, not a string
+            "DA": int(1)  # Send as an integer, not a string
         }]
     })
     ser.write((init_command + "\n").encode('utf-8'))
