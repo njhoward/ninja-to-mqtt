@@ -34,6 +34,18 @@ logging.info("Starting NinjaCape MQTT Bridge")
 try:
     ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
     logging.info(f"Opened serial port {SERIAL_PORT} at {BAUD_RATE} baud")
+
+    init_command = json.dumps({
+        "DEVICE": [{
+            "G": "0",
+            "V": 0,
+            "D": 33,
+            "DA": 1  # Send as an integer, not a string
+        }]
+    })
+    ser.write((init_command + "\n").encode('utf-8'))
+    logging.info(f"Sent startup 433MHz enable command: {init_command}")
+
 except Exception as e:
     logging.error(f"Could not open serial port {SERIAL_PORT}: {e}")
     exit(1)
