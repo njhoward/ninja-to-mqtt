@@ -47,7 +47,12 @@ def process_ninjacape_messages(ser, mqtt_client):
                 
                 # Publish received sensor data to MQTT
                 mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value)
-                logging.info(f"Published: {dev_id} -> {dev_value}")
+
+                # log and notify if anything other than 999 or 1007
+                if not dev_id in {"999", "1007"}:
+                    logging.info(f"Published: {dev_id} -> {dev_value}")
+                    send_notification(f"Published: {dev_id} -> {dev_value}")
+
             else:
                 logging.warning(f"Unknown format: {line}")
                 send_notification(f"Unknown serial data: {line}")
