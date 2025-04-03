@@ -33,7 +33,7 @@ def process_ninjacape_messages(ser, mqtt_client):
                 continue
 
             if "ACK" in data:
-                logging.debug(f"ACK: {data}")
+                logging.info(f"ACK: {data}")
                 continue
 
             if "DEVICE" in data:
