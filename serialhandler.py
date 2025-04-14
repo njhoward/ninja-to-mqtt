@@ -54,17 +54,31 @@ def process_ninjacape_messages(ser, mqtt_client):
 
                 logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
 
-                if dev_id in "11" and protocol in "5":
+                if dev_id == "11" and protocol == "5":
                     logging.debug(f"Dev_ID: 11 and protocol: 5")
                     result = parse_sensor_data(dev_value)
                     if result.get("valid"):
-                        logging.debug(f"Received sensor data: Temp={result['temperature']}°C, Humidity={result['humidity']}% "
-                                    f"(House={result['house']}, Station={result['station']})")
-                        # Example: could publish to MQTT or update internal state
+
+                        # Always log all parsed fields
+                        logging.debug(
+                            f"Parsed sensor data (raw={dev_value}): "
+                            f"House={result.get('house')}, Station={result.get('station')}, "
+                            f"Temperature={result.get('temperature')}°C, Humidity={result.get('humidity')}%, "
+                            f"ID={result.get('id')}, Unknown={result.get('unknown')} "
+                            f"(Valid={result.get('valid')}, Reason={result.get('reason')})"
+                        )
+
+                        temp = result["temperature"]
+                        hum = result["humidity"]
+                        mqtt_client.publish("ninjaCape/input/31", temp)
+                        mqtt_client.publish("ninjaCape/input/30", hum)
+                        logging.info(f"Published: 31 -> {temp} (temperature)")
+                        logging.info(f"Published: 30 -> {hum} (humidity)")
+                        send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
+                        continue  # Skip default publish for dev_id=11 if handled above
                     else:
                         logging.info(f"Unrecognized or non-temperature protocol 5 data: {dev_value} "
                                     f"(Reason: {result.get('reason')})")
-                        # Could choose to skip MQTT, store raw data for review, etc
                 
                 # Publish received sensor data to MQTT
                 mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value)
