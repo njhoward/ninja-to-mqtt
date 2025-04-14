@@ -32,11 +32,11 @@ def setup_mqtt(ser):
                 send_notification(f"Message from device 674: {moderated}")
 
 
-            logging.debug(f"MQTT received on topic: {msg.topic}, payload: {payload}")
-            logging.debug(f"Device ID: {device_id}, Moderated: {moderated}")
-            logging.debug(f"Final command: {command}")
-            serial_bytes = (command + "\n").encode("utf-8")
-            logging.debug(f"[MQTTHandler] Serial payload bytes: {serial_bytes}")
+            #logging.debug(f"MQTT received on topic: {msg.topic}, payload: {payload}")
+            #logging.debug(f"Device ID: {device_id}, Moderated: {moderated}")
+            #logging.debug(f"Final command: {command}")
+            #serial_bytes = (command + "\n").encode("utf-8")
+            #logging.debug(f"[MQTTHandler] Serial payload bytes: {serial_bytes}")
 
 
         except Exception as e:
