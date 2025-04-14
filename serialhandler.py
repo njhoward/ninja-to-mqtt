@@ -9,9 +9,6 @@ def init_serial():
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
         logging.info(f"Serial port {SERIAL_PORT} opened.")
-        init_command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": 8890, "DA": 1}]})
-        ser.write((init_command + "\n").encode("utf-8"))
-        logging.info("Sent startup 433MHz enable command.")
         return ser
     except Exception as e:
         logging.error(f"Error opening serial port: {e}")
