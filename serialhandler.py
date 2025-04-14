@@ -52,10 +52,10 @@ def process_ninjacape_messages(ser, mqtt_client):
                 if dev_id in {"999", "1007"}:
                     dev_value = hex_to_rgb_string(dev_value)
 
-                logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
+                #logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
 
                 if dev_id == "11" and protocol == "5":
-                    logging.debug(f"Dev_ID: 11 and protocol: 5")
+                    #logging.debug(f"Dev_ID: 11 and protocol: 5")
                     result = parse_sensor_data(dev_value)
                     if result.get("valid"):
 
@@ -74,7 +74,7 @@ def process_ninjacape_messages(ser, mqtt_client):
                         mqtt_client.publish("ninjaCape/input/30", hum)
                         logging.info(f"Published: 31 -> {temp} (temperature)")
                         logging.info(f"Published: 30 -> {hum} (humidity)")
-                        send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
+                        #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
                         continue  # Skip default publish for dev_id=11 if handled above
                     else:
                         logging.info(f"Unrecognized or non-temperature protocol 5 data: {dev_value} "
