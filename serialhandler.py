@@ -52,7 +52,10 @@ def process_ninjacape_messages(ser, mqtt_client):
                 if dev_id in {"999", "1007"}:
                     dev_value = hex_to_rgb_string(dev_value)
 
+                logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
+
                 if dev_id in "11" and protocol in "5":
+                    logging.debug(f"Dev_ID: 11 and protocol: 5")
                     result = parse_sensor_data(dev_value)
                     if result.get("valid"):
                         logging.debug(f"Received sensor data: Temp={result['temperature']}°C, Humidity={result['humidity']}% "
