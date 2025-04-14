@@ -26,7 +26,6 @@ def setup_mqtt(ser):
              # Send command to NinjaCape via Serial
             ser.write((command + "\n").encode("utf-8"))
             logging.info(f"Sent to serial: {command}")
-            logging.debug(f"[MQTTHandler] Serial payload bytes: {(command + '\\n').encode('utf-8')}")
 
             if int(device_id) == 674:
                 logging.info(f"Message from device 674: {moderated}")
@@ -36,7 +35,9 @@ def setup_mqtt(ser):
             logging.debug(f"MQTT received on topic: {msg.topic}, payload: {payload}")
             logging.debug(f"Device ID: {device_id}, Moderated: {moderated}")
             logging.debug(f"Final command: {command}")
-            logging.debug(f"Bytes sent to serial: {(command + '\\n').encode('utf-8')}")
+            serial_bytes = (command + "\n").encode("utf-8")
+            logging.debug(f"[MQTTHandler] Serial payload bytes: {serial_bytes}")
+
 
         except Exception as e:
             logging.error(f"Error processing MQTT message: {e}")
