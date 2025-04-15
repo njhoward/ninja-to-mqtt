@@ -6,6 +6,7 @@ from utils import hex_to_rgb_string
 from notifier import send_notification
 from rfhandler import parse_sensor_data
 from mqtthandler import publish_payload
+from rfhandler import log_if_suspicious_rf
 
 def init_serial():
     try:
@@ -55,31 +56,33 @@ def process_ninjacape_messages(ser, mqtt_client):
 
                 #logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
 
-                if dev_id == "11" and protocol == "5":
-                    #logging.debug(f"Dev_ID: 11 and protocol: 5")
-                    result = parse_sensor_data(dev_value)
-                    if result.get("valid"):
+                if dev_id == "11": 
+                    log_if_suspicious_rf(data, line)
+                    if protocol == "5":
+                        #logging.debug(f"Dev_ID: 11 and protocol: 5")
+                        result = parse_sensor_data(dev_value)
+                        if result.get("valid"):
 
-                        # Always log all parsed fields
-                        logging.debug(
-                            f"Parsed sensor data (raw={dev_value}): "
-                            f"House={result.get('house')}, Station={result.get('station')}, "
-                            f"Temperature={result.get('temperature')}°C, Humidity={result.get('humidity')}%, "
-                            f"ID={result.get('id')}, Unknown={result.get('unknown')} "
-                            f"(Valid={result.get('valid')}, Reason={result.get('reason')})"
-                        )
+                            # Always log all parsed fields
+                            logging.debug(
+                                f"Parsed sensor data (raw={dev_value}): "
+                                f"House={result.get('house')}, Station={result.get('station')}, "
+                                f"Temperature={result.get('temperature')}°C, Humidity={result.get('humidity')}%, "
+                                f"ID={result.get('id')}, Unknown={result.get('unknown')} "
+                                f"(Valid={result.get('valid')}, Reason={result.get('reason')})"
+                            )
 
-                        temp = result["temperature"]
-                        hum = result["humidity"]
-                        mqtt_client.publish("ninjaCape/input/31", temp)
-                        mqtt_client.publish("ninjaCape/input/30", hum)
-                        logging.info(f"Published: 31 -> {temp} (temperature)")
-                        logging.info(f"Published: 30 -> {hum} (humidity)")
-                        #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
-                        continue  # Skip default publish for dev_id=11 if handled above
-                    else:
-                        logging.info(f"Unrecognized or non-temperature protocol 5 data: {dev_value} "
-                                    f"(Reason: {result.get('reason')})")
+                            temp = result["temperature"]
+                            hum = result["humidity"]
+                            mqtt_client.publish("ninjaCape/input/31", temp)
+                            mqtt_client.publish("ninjaCape/input/30", hum)
+                            logging.info(f"Published: 31 -> {temp} (temperature)")
+                            logging.info(f"Published: 30 -> {hum} (humidity)")
+                            #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
+                            continue  # Skip default publish for dev_id=11 if handled above
+                        else:
+                            logging.info(f"Unrecognized or non-temperature protocol 5 data: {dev_value} "
+                                        f"(Reason: {result.get('reason')})")
                 
                 # Publish received sensor data to MQTT
                 publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)

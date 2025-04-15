@@ -1,3 +1,6 @@
+import logging
+
+suspicious_logger = logging.getLogger("suspicious")
 
 def parse_sensor_data(value_str: str) -> dict:
     result = {
@@ -62,3 +65,25 @@ def parse_sensor_data(value_str: str) -> dict:
     })
 
     return result
+
+def log_if_suspicious_rf(data, raw_line=""):
+    device_list = data.get("DEVICE", [])
+    for device in device_list:
+        dev_id = device.get("D")
+        protocol = device.get("V")
+        da = device.get("DA")
+
+        if dev_id == 11:
+            if protocol != 5:
+                suspicious_logger.warning(f"Suspicious: dev_id=11 but unexpected protocol={protocol}. Raw: {raw_line}")
+            elif isinstance(da, (str, int)):
+                parsed = parse_sensor_data(str(da))
+                if not parsed["valid"]:
+                    suspicious_logger.warning(
+                        f"Suspicious: dev_id=11/protocol=5, but parse failed. Reason: {parsed['reason']}. Raw: {raw_line}"
+                    )
+                elif parsed.get("house") != 1 or parsed.get("station") != 1:
+                    suspicious_logger.warning(
+                        f"Suspicious: dev_id=11/protocol=5, house={parsed.get('house')}, station={parsed.get('station')} "
+                        f"(expected 1/1). Raw: {raw_line}"
+                    )
