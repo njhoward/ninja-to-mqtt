@@ -5,6 +5,7 @@ from config import SERIAL_PORT, BAUD_RATE, SERIAL_TIMEOUT
 from utils import hex_to_rgb_string
 from notifier import send_notification
 from rfhandler import parse_sensor_data
+from mqtthandler import publish_payload
 
 def init_serial():
     try:
@@ -81,7 +82,8 @@ def process_ninjacape_messages(ser, mqtt_client):
                                     f"(Reason: {result.get('reason')})")
                 
                 # Publish received sensor data to MQTT
-                mqtt_client.publish(f"ninjaCape/input/{dev_id}", dev_value)
+                publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
+
 
                 # log and notify if anything other than 999 or 1007
                 if not dev_id in {"999", "1007"}:
