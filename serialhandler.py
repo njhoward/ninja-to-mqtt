@@ -89,7 +89,7 @@ def process_ninjacape_messages(ser, mqtt_client):
 
 
                 #Eye and Status LED specific logic
-                if not dev_id in {"999", "1007"}:
+                if dev_id in {"999", "1007"}:
                     logging.debug(f"Published: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
                     on_value = True
