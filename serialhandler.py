@@ -88,12 +88,19 @@ def process_ninjacape_messages(ser, mqtt_client):
                 publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
 
 
-                # log and notify if anything other than 999 or 1007
+                #Eye and Status LED specific logic
                 if not dev_id in {"999", "1007"}:
+                    logging.debug(f"Published: {dev_id} -> {dev_value}")
+                    # specific on / off for LED's
+                    on_value = True
+                    if dev_value == "0,0,0":
+                        on_value = False
+                    publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value, dev_id=dev_id)
+                    logging.debug(f"Published On: {dev_id} -> {on_value}")
+                else:
+                    # log and notify if anything other than 999 or 1007
                     logging.info(f"Published: {dev_id} -> {dev_value}")
                     send_notification(f"Published: {dev_id} -> {dev_value}")
-                else:
-                    logging.debug(f"Published: {dev_id} -> {dev_value}")
 
             else:
                 logging.warning(f"Unknown format: {line}")
