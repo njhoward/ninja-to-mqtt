@@ -92,9 +92,9 @@ def process_ninjacape_messages(ser, mqtt_client):
                 if dev_id in {"999", "1007"}:
                     logging.debug(f"Published: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
-                    on_value = True
+                    on_value = "true"
                     if dev_value == "0,0,0":
-                        on_value = False
+                        on_value = "false"
                     publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value.lower(), dev_id=dev_id)
                     logging.debug(f"Published On: {dev_id} -> {on_value}")
                 else:
