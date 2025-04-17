@@ -27,7 +27,6 @@ def setup_mqtt(ser):
     def on_message(client, userdata, msg):
         payload = msg.payload.decode()
         topic_parts = msg.topic.split("/")
-        device_id = msg.topic.split("/")[-1]
         try:
 
             if topic_parts[-1] == "on":
@@ -76,18 +75,17 @@ def publish_payload(client, topic, payload, dev_id=None):
     """
     if dev_id in THROTTLED_IDS:
         now = time.time()
-        last_entry = recent_publishes.get(dev_id)
+        cache_key = (dev_id, topic)  # 🔄 Cache key uses dev_id AND topic
+        last_entry = recent_publishes.get(cache_key)
 
         if last_entry:
             last_time = last_entry["timestamp"]
             last_value = last_entry["payload"]
             if last_value == payload and now - last_time < THROTTLE_SECONDS:
-                logging.debug(f"[MQTTHandler] Throttled publish for device {dev_id} (unchanged, <5m)")
-                return  # Do not publish
+                logging.debug(f"[MQTTHandler] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
+                return
 
-        # Update cache (because we're publishing)
-        recent_publishes[dev_id] = {"timestamp": now, "payload": payload}
+        recent_publishes[cache_key] = {"timestamp": now, "payload": payload}
 
-    # If not throttled, or conditions allow, publish
     client.publish(topic, payload)
     logging.info(f"Published: {topic} -> {payload}")
