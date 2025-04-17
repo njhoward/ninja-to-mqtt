@@ -73,7 +73,14 @@ def publish_payload(client, topic, payload, dev_id=None):
     """
     Publish to MQTT, applying throttling logic for specific dev_ids.
     """
+
+    try:
+        dev_id = int(dev_id)
+    except (TypeError, ValueError):
+        dev_id = None
+
     if dev_id in THROTTLED_IDS:
+        logging.debug(f"[THROTTLE] Checking {dev_id=} {topic=} {payload=}")
         now = time.time()
         cache_key = (dev_id, topic)  # 🔄 Cache key uses dev_id AND topic
         last_entry = recent_publishes.get(cache_key)
