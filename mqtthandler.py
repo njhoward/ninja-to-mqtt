@@ -26,11 +26,23 @@ def setup_mqtt(ser):
 
     def on_message(client, userdata, msg):
         payload = msg.payload.decode()
+        topic_parts = msg.topic.split("/")
         device_id = msg.topic.split("/")[-1]
         try:
-            #convert to hex if tuple
-            moderated = convert_to_hex(payload)
-            command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated)}]})
+
+            if topic_parts[-1] == "on":
+                device_id = int(topic_parts[-2])
+                is_on = str(payload).lower() == "true"
+                if not is_on:
+                    command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": "000000"}]})
+                else:
+                    return
+            else:
+            # Handle RGB
+                device_id = int(topic_parts[-1])
+                #convert to hex if tuple
+                moderated = convert_to_hex(payload)
+                command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated)}]})
 
              # Send command to NinjaCape via Serial
             ser.write((command + "\n").encode("utf-8"))
