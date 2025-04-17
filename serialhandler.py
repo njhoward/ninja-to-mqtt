@@ -95,7 +95,7 @@ def process_ninjacape_messages(ser, mqtt_client):
                     on_value = "true"
                     if dev_value == "0,0,0":
                         on_value = "false"
-                    publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value.lower(), dev_id=dev_id)
+                    publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value, dev_id=dev_id)
                     logging.debug(f"Published On: {dev_id} -> {on_value}")
                 else:
                     # log and notify if anything other than 999 or 1007
