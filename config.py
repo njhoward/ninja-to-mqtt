@@ -7,6 +7,10 @@ MQTT_BROKER = "raspberrypi"
 MQTT_PORT = 1883
 SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
 
+# LED device IDs
+STATUS_LED_ID = 999
+EYES_LED_ID = 1007
+
 # PUSHOVER config - retrieved from environment varables
 PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY")
 PUSHOVER_API_TOKEN = os.getenv("PUSHOVER_API_TOKEN")

@@ -15,12 +15,12 @@ def main():
     ser = init_serial()
     mqtt_client = setup_mqtt(ser)
 
+    # Start the scheduler after mqtt is ready
+    scheduler_thread = threading.Thread(target=run_scheduler, args=(mqtt_client,), daemon=True)
+    scheduler_thread.start()
+
     process_ninjacape_messages(ser, mqtt_client)
 
 if __name__ == "__main__":
-    # Start the scheduler in a background thread
-    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-    scheduler_thread.start()
-
     # Main bridge loop
     main()

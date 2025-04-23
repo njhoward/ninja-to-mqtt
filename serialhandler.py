@@ -7,6 +7,8 @@ from notifier import send_notification
 from rfhandler import parse_sensor_data
 from mqtthandler import publish_payload
 from rfhandler import log_if_suspicious_rf
+from config import STATUS_LED_ID, EYES_LED_ID
+from statehandler import current_states
 
 def init_serial():
     try:
@@ -51,7 +53,7 @@ def process_ninjacape_messages(ser, mqtt_client):
                 dev_value = str(dev["DA"])
 
                 #convert to rgb if ninja status (999) or rgb (1007) led's
-                if dev_id in {"999", "1007"}:
+                if dev_id in {STATUS_LED_ID, EYES_LED_ID}:
                     dev_value = hex_to_rgb_string(dev_value)
 
                 #logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
@@ -74,9 +76,13 @@ def process_ninjacape_messages(ser, mqtt_client):
 
                             temp = result["temperature"]
                             hum = result["humidity"]
+
                             mqtt_client.publish("ninjaCape/input/31", temp)
-                            mqtt_client.publish("ninjaCape/input/30", hum)
+                            current_states["31"] = temp
                             logging.info(f"Published: 31 -> {temp} (temperature)")
+
+                            mqtt_client.publish("ninjaCape/input/30", hum)
+                            current_states["30"] = hum
                             logging.info(f"Published: 30 -> {hum} (humidity)")
                             #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
                             continue  # Skip default publish for dev_id=11 if handled above
@@ -85,11 +91,12 @@ def process_ninjacape_messages(ser, mqtt_client):
                                         f"(Reason: {result.get('reason')})")
                 
                 # Publish received sensor data to MQTT
+                current_states[dev_id] = dev_value
                 publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
 
 
                 #Eye and Status LED specific logic
-                if dev_id in {"999", "1007"}:
+                if dev_id in {STATUS_LED_ID, EYES_LED_ID}:
                     logging.debug(f"Published: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
                     on_value = "true"

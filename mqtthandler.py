@@ -5,6 +5,7 @@ import paho.mqtt.client as mqtt
 from utils import convert_to_hex
 from notifier import send_notification
 from config import MQTT_BROKER, MQTT_PORT
+from statehandler import current_states
 
 # Cache of recent publishes
 recent_publishes = {}
@@ -42,6 +43,7 @@ def setup_mqtt(ser):
                 #convert to hex if tuple
                 moderated = convert_to_hex(payload)
                 command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated)}]})
+                current_states[device_id] = moderated
 
              # Send command to NinjaCape via Serial
             ser.write((command + "\n").encode("utf-8"))
