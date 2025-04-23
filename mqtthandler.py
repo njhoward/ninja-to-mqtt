@@ -32,7 +32,10 @@ def setup_mqtt(ser):
         topic_parts = topic.split("/")
         try:
 
+            logging.info(f"topic 35: {topic}")
+
             if topic == "ninjaCape/debug/states":
+                logging.info("states 38")
                 state_snapshot = get_all_states()
                 logging.info("Current state dump requested via MQTT:")
                 for key, value in state_snapshot.items():
