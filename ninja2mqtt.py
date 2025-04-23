@@ -12,14 +12,14 @@ def main():
     setup_logging()
     logging.info("Starting NinjaCape MQTT Bridge")
 
-    ser = init_serial()
-    mqtt_client = setup_mqtt(ser)
+    init_serial()
+    mqtt_client = setup_mqtt()
 
     # Start the scheduler after mqtt is ready
     scheduler_thread = threading.Thread(target=run_scheduler, args=(mqtt_client,), daemon=True)
     scheduler_thread.start()
 
-    process_ninjacape_messages(ser, mqtt_client)
+    process_ninjacape_messages(mqtt_client)
 
 if __name__ == "__main__":
     # Main bridge loop

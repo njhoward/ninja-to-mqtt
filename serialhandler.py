@@ -1,3 +1,4 @@
+# serialhandler.py 
 import serial
 import json
 import logging
@@ -10,16 +11,22 @@ from rfhandler import log_if_suspicious_rf
 from config import STATUS_LED_ID, EYES_LED_ID
 from statehandler import current_states
 
+ser = None
+
 def init_serial():
+    global ser
     try:
         ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=SERIAL_TIMEOUT)
         logging.info(f"Serial port {SERIAL_PORT} opened.")
-        return ser
     except Exception as e:
         logging.error(f"Error opening serial port: {e}")
         exit(1)
 
-def process_ninjacape_messages(ser, mqtt_client):
+def send_ninjacape_messages(command):
+    ser.write((command + "\n").encode("utf-8"))
+    logging.info(f"Sent to serial: {command}")
+
+def process_ninjacape_messages(mqtt_client):
     while True:
         try:
             raw = ser.readline()

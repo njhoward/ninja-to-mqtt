@@ -6,6 +6,7 @@ import paho.mqtt.client as mqtt
 from utils import convert_to_hex
 from notifier import send_notification
 from config import MQTT_BROKER, MQTT_PORT
+from serialhandler import send_ninjacape_messages
 from statehandler import current_states
 # from statehandler import get_all_states
 from config import STATUS_LED_ID, EYES_LED_ID
@@ -19,7 +20,7 @@ THROTTLED_IDS = {999, 1007, 30, 31}
 THROTTLE_SECONDS = 300  # 5 minutes
 
 
-def setup_mqtt(ser):
+def setup_mqtt():
     client = mqtt.Client(client_id="beaglebone-ninja")
 
     def on_connect(client, userdata, flags, rc):
@@ -91,8 +92,9 @@ def setup_mqtt(ser):
                 current_states[device_id] = moderated
 
              # Send command to NinjaCape via Serial
-            ser.write((command + "\n").encode("utf-8"))
-            logging.info(f"Sent to serial: {command}")
+            send_ninjacape_messages(command)
+            #ser.write((command + "\n").encode("utf-8"))
+            #logging.info(f"Sent to serial: {command}")
 
             if int(device_id) == 674:
                 logging.info(f"Message from device 674: {moderated}")
