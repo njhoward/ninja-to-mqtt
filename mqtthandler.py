@@ -117,6 +117,7 @@ def setup_mqtt():
     client.connect(MQTT_BROKER, MQTT_PORT, keepalive=60)
     client.loop_start()
     return client
+    
 
 def publish_payload(client, topic, payload, dev_id=None):
     """

@@ -6,7 +6,6 @@ from config import SERIAL_PORT, BAUD_RATE, SERIAL_TIMEOUT
 from utils import hex_to_rgb_string
 from notifier import send_notification
 from rfhandler import parse_sensor_data
-from mqtthandler import publish_payload
 from rfhandler import log_if_suspicious_rf
 from config import STATUS_LED_ID, EYES_LED_ID
 from statehandler import current_states
@@ -23,8 +22,17 @@ def init_serial():
         exit(1)
 
 def send_ninjacape_messages(command):
-    ser.write((command + "\n").encode("utf-8"))
-    logging.info(f"Sent to serial: {command}")
+    if ser:
+        ser.write((command + "\n").encode("utf-8"))
+        logging.info(f"Sent to serial: {command}")
+    else:
+        logging.error("Serial port not initialized.")
+
+
+def publish_to_mqtt(mqtt_client, topic, payload, dev_id):
+    from mqtthandler import publish_payload
+    publish_payload(mqtt_client, topic, payload, dev_id=dev_id)
+
 
 def process_ninjacape_messages(mqtt_client):
     while True:
@@ -99,7 +107,7 @@ def process_ninjacape_messages(mqtt_client):
                 
                 # Publish received sensor data to MQTT
                 current_states[dev_id] = dev_value
-                publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
+                publish_to_mqtt(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
 
 
                 #Eye and Status LED specific logic
@@ -109,7 +117,7 @@ def process_ninjacape_messages(mqtt_client):
                     on_value = "true"
                     if dev_value == "0,0,0":
                         on_value = "false"
-                    publish_payload(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value, dev_id=dev_id)
+                    publish_to_mqtt(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value, dev_id=dev_id)
                     logging.debug(f"Published On: {dev_id} -> {on_value}")
                 else:
                     # log and notify if anything other than 999 or 1007
