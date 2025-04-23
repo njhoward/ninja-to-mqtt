@@ -23,6 +23,7 @@ def setup_mqtt(ser):
         if rc == 0:
             logging.info("Connected to MQTT broker")
             client.subscribe("ninjaCape/output/#")
+            client.subscribe("ninjaCape/debug/#")
         else:
             logging.error(f"MQTT connection failed with code {rc}")
 
