@@ -33,7 +33,9 @@ def setup_mqtt(ser):
         topic_parts = topic.split("/")
         try:
 
-            logging.info(f"topic 35: {topic}")
+            if topic == "ninjaCape/output":
+                logging.debug("Received ninjaCape/output root message — ignoring.")
+                return
 
             if topic == "ninjaCape/debug/states":
                 logging.info("states 38")
@@ -51,7 +53,7 @@ def setup_mqtt(ser):
                 else:
                     return
             else:
-            # Handle RGB
+                # Handle RGB
                 device_id = int(topic_parts[-1])
                 #convert to hex if tuple
                 moderated = convert_to_hex(payload)
