@@ -1,3 +1,4 @@
+#schedular.py
 import threading
 import time
 import json
@@ -22,7 +23,8 @@ def send_led(mqtt_client, device_id, color_hex):
             "DA": color_hex
         }]
     }
-    mqtt_client.publish("ninjaCape/output", json.dumps(payload))
+    topic = f"ninjaCape/output/{device_id}"
+    mqtt_client.publish(topic, color_hex)
     logging.info(f"LED {device_id} -> {color_hex}")
 
 
