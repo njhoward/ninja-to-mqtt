@@ -6,6 +6,7 @@ from utils import convert_to_hex
 from notifier import send_notification
 from config import MQTT_BROKER, MQTT_PORT
 from statehandler import current_states
+from statehandler import get_all_states
 
 # Cache of recent publishes
 recent_publishes = {}
@@ -27,9 +28,17 @@ def setup_mqtt(ser):
 
     def on_message(client, userdata, msg):
         payload = msg.payload.decode()
-        topic_parts = msg.topic.split("/")
+        topic = msg.topic
+        topic_parts = topic.split("/")
         try:
 
+            if topic == "ninjaCape/debug/states":
+                state_snapshot = get_all_states()
+                logging.info("Current state dump requested via MQTT:")
+                for key, value in state_snapshot.items():
+                    logging.info(f"  {key}: {value}")
+                return
+            
             if topic_parts[-1] == "on":
                 device_id = int(topic_parts[-2])
                 is_on = str(payload).lower() == "true"
