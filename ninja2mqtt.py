@@ -1,13 +1,26 @@
+import logging
+import threading
+
 from logger import setup_logging
 from config import SERIAL_PORT, BAUD_RATE, SERIAL_TIMEOUT
 from serialhandler import init_serial, process_ninjacape_messages
 from mqtthandler import setup_mqtt
-import logging
+from scheduler import run_scheduler
 
-setup_logging()
-logging.info("Starting NinjaCape MQTT Bridge")
 
-ser = init_serial()
-mqtt_client = setup_mqtt(ser)
+def main():
+    setup_logging()
+    logging.info("Starting NinjaCape MQTT Bridge")
 
-process_ninjacape_messages(ser, mqtt_client)
+    ser = init_serial()
+    mqtt_client = setup_mqtt(ser)
+
+    process_ninjacape_messages(ser, mqtt_client)
+
+if __name__ == "__main__":
+    # Start the scheduler in a background thread
+    scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+    scheduler_thread.start()
+
+    # Main bridge loop
+    main()
