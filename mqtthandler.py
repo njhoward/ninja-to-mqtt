@@ -33,6 +33,13 @@ def setup_mqtt(ser):
         topic_parts = topic.split("/")
         try:
 
+            if msg.retain:
+                logging.debug(
+                    f"[MQTTHandler] Skipped retained message from broker — "
+                    f"topic: '{msg.topic}', payload: '{msg.payload.decode()}'"
+                )
+                return
+
             if topic == "ninjaCape/output":
                 logging.debug("Received ninjaCape/output root message — ignoring.")
                 return
