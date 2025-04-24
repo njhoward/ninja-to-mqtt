@@ -40,17 +40,21 @@ def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
     logging.info(f"[Debug] perform_hourly_blink - hour {hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
 
     send_led(STATUS_LED_ID, "000000")
+    time.sleep(0.2)
     send_led(EYES_LED_ID, "000000")
     time.sleep(2)
     for _ in range(hour):
         send_led(STATUS_LED_ID, blink_color)
+        time.sleep(0.2)
         send_led(EYES_LED_ID, blink_color)
         time.sleep(1)
         send_led(STATUS_LED_ID, "000000")
+        time.sleep(0.2)
         send_led(EYES_LED_ID, "000000")
         time.sleep(0.5)
 
     send_led(STATUS_LED_ID, status_before)
+    time.sleep(0.2)
     send_led(EYES_LED_ID, eyes_before)
     logging.info("LED colors restored after blinking")
 
