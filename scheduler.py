@@ -7,7 +7,7 @@ import random
 from datetime import datetime, timedelta
 from config import STATUS_LED_ID, EYES_LED_ID
 from serialhandler import send_ninjacape_messages
-from statehandler import current_states
+from statehandler import get_state
 
 VALID_LED_COLORS = [
     "FF0000", "00FF00", "0000FF",
@@ -70,8 +70,8 @@ def blink_hourly_leds():
         hour = next_hour.hour or 12
         logging.info(f"Blinking {hour} times to mark hour {hour}")
 
-        status_before = current_states.get(str(STATUS_LED_ID), "0000FF")
-        eyes_before = current_states.get(str(EYES_LED_ID), "0000FF")
+        status_before = get_state(str(STATUS_LED_ID), "0000FF")
+        eyes_before = get_state(str(EYES_LED_ID), "0000FF")
         blink_color = choose_blink_color(status_before, eyes_before)
         logging.info(f"Blink color chosen: {blink_color}")
 

@@ -7,8 +7,7 @@ from utils import convert_to_hex
 from notifier import send_notification
 from config import MQTT_BROKER, MQTT_PORT
 from serialhandler import send_ninjacape_messages
-from statehandler import current_states
-# from statehandler import get_all_states
+from statehandler import set_state
 from config import STATUS_LED_ID, EYES_LED_ID
 from mqttdebugs import handle_debugs
 
@@ -65,7 +64,8 @@ def setup_mqtt():
                 #convert to hex if tuple
                 moderated = convert_to_hex(payload)
                 command = json.dumps({"DEVICE": [{"G": "0", "V": 0, "D": int(device_id), "DA": str(moderated)}]})
-                current_states[device_id] = moderated
+                #current_states[device_id] = moderated
+                set_state(device_id, moderated)
 
              # Send command to NinjaCape via Serial
             send_ninjacape_messages(command)

@@ -8,7 +8,7 @@ from notifier import send_notification
 from rfhandler import parse_sensor_data
 from rfhandler import log_if_suspicious_rf
 from config import STATUS_LED_ID, EYES_LED_ID
-from statehandler import current_states
+from statehandler import set_state
 
 ser = None
 
@@ -93,11 +93,13 @@ def process_ninjacape_messages(mqtt_client):
                             hum = result["humidity"]
 
                             mqtt_client.publish("ninjaCape/input/31", temp)
-                            current_states["31"] = temp
+                            #current_states["31"] = temp
+                            set_state("31", temp)
                             logging.info(f"Published: 31 -> {temp} (temperature)")
 
                             mqtt_client.publish("ninjaCape/input/30", hum)
-                            current_states["30"] = hum
+                            #current_states["30"] = hum
+                            set_state("30", hum)
                             logging.info(f"Published: 30 -> {hum} (humidity)")
                             #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
                             continue  # Skip default publish for dev_id=11 if handled above
@@ -106,7 +108,8 @@ def process_ninjacape_messages(mqtt_client):
                                         f"(Reason: {result.get('reason')})")
                 
                 # Publish received sensor data to MQTT
-                current_states[dev_id] = dev_value
+                #current_states[dev_id] = dev_value
+                set_state(dev_id, dev_value)
                 publish_to_mqtt(mqtt_client, f"ninjaCape/input/{dev_id}", dev_value, dev_id=dev_id)
 
 
