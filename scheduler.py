@@ -36,6 +36,9 @@ def choose_blink_color(status_color, eyes_color):
 
 
 def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
+
+    logging.info(f"[Debug] perform_hourly_blink - hour {hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
+
     send_led(STATUS_LED_ID, "000000")
     send_led(EYES_LED_ID, "000000")
     time.sleep(2)
