@@ -19,7 +19,7 @@ def handle_debugs(mqttclient, topic, payload):
             eyes_before = current_states.get(str(EYES_LED_ID), "0000FF")
             blink_color = choose_blink_color(status_before, eyes_before)
 
-            perform_hourly_blink(mqttclient, hour, blink_color, status_before, eyes_before)
+            perform_hourly_blink(hour, blink_color, status_before, eyes_before)
             logging.info(f"Manually triggered hourly blink for {hour} o'clock")
         except Exception as e:
             logging.error(f"Failed to trigger manual blink: {e}")
