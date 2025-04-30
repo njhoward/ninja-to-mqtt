@@ -11,6 +11,9 @@ SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
 STATUS_LED_ID = 999
 EYES_LED_ID = 1007
 
+#
+TIME_ZONE = "Australia/Melbourne"
+
 # PUSHOVER config - retrieved from environment varables
 PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY")
 PUSHOVER_API_TOKEN = os.getenv("PUSHOVER_API_TOKEN")

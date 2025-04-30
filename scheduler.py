@@ -5,7 +5,8 @@ import json
 import logging
 import random
 from datetime import datetime, timedelta
-from config import STATUS_LED_ID, EYES_LED_ID
+from zoneinfo import ZoneInfo
+from config import STATUS_LED_ID, EYES_LED_ID, TIME_ZONE
 from serialhandler import send_ninjacape_messages
 from statehandler import get_state
 
@@ -24,7 +25,8 @@ def send_led(device_id, color_hex):
 
 
 def get_next_hour_time(now=None):
-    now = now or datetime.utcnow()
+    tz = ZoneInfo(TIME_ZONE)
+    now = now or datetime.now(tz)
     next_hour = now.replace(minute=0, second=0, microsecond=0)
     if now >= next_hour:
         next_hour += timedelta(hours=1)
@@ -62,22 +64,33 @@ def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
 
 
 def blink_hourly_leds():
+    tz_aest = ZoneInfo(TIME_ZONE)
+
     while True:
-        now = datetime.now()
-        next_hour = get_next_hour_time(now)
-        sleep_time = (next_hour - now).total_seconds()
-        logging.info(f"Next blink scheduled in {int(sleep_time)} seconds")
+        # Use AEST to determine the next AEST hour boundary
+        now_aest = datetime.now(tz_aest)
+        next_hour_aest = now_aest.replace(minute=0, second=0, microsecond=0)
+        if now_aest >= next_hour_aest:
+            next_hour_aest += timedelta(hours=1)
+
+        # Convert to UTC for sleep duration
+        next_hour_utc = next_hour_aest.astimezone(ZoneInfo("UTC"))
+        now_utc = datetime.utcnow()
+        sleep_time = (next_hour_utc - now_utc).total_seconds()
+
+        logging.info(f"Next blink scheduled for {next_hour_aest.strftime('%Y-%m-%d %H:%M:%S')} AEST (in {int(sleep_time)} seconds)")
         time.sleep(sleep_time)
 
-        hour = next_hour.hour or 12
-        logging.info(f"Blinking {hour} times to mark hour {hour}")
+        # After waking up, use the AEST hour for blink count
+        blink_hour = next_hour_aest.hour or 12
+        logging.info(f"Blinking {blink_hour} times to mark hour {blink_hour} AEST")
 
         status_before = get_state(str(STATUS_LED_ID), "0000FF")
         eyes_before = get_state(str(EYES_LED_ID), "0000FF")
         blink_color = choose_blink_color(status_before, eyes_before)
         logging.info(f"Blink color chosen: {blink_color}")
 
-        perform_hourly_blink(hour, blink_color, status_before, eyes_before)
+        perform_hourly_blink(blink_hour, blink_color, status_before, eyes_before)
 
 
 def run_scheduler():
