@@ -24,8 +24,10 @@ def send_led(device_id, color_hex):
 
 
 def get_next_hour_time(now=None):
-    now = now or datetime.now()
-    next_hour = (now + timedelta(hours=1)).replace(minute=0, second=0, microsecond=0)
+    now = now or datetime.utcnow()
+    next_hour = now.replace(minute=0, second=0, microsecond=0)
+    if now >= next_hour:
+        next_hour += timedelta(hours=1)
     return next_hour
 
 
