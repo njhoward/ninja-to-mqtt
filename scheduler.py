@@ -4,6 +4,7 @@ import time
 import json
 import logging
 import random
+import schedule
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from config import STATUS_LED_ID, EYES_LED_ID, TIME_ZONE
@@ -66,33 +67,25 @@ def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
 def blink_hourly_leds():
     logging.info(f"blink_hourly_leds into method")    
     tz_aest = ZoneInfo(TIME_ZONE)
-    while True:
-        # Use AEST to determine the next AEST hour boundary
-        now_aest = datetime.now(tz_aest)
-        next_hour_aest = now_aest.replace(minute=0, second=0, microsecond=0)
-        if now_aest >= next_hour_aest:
-            next_hour_aest += timedelta(hours=1)
+    now_aest = datetime.now(tz_aest)
+    blink_hour = now_aest.hour or 12
 
-        # Convert to UTC for sleep duration
-        next_hour_utc = next_hour_aest.astimezone(ZoneInfo("UTC"))
-        now_utc = datetime.utcnow()
-        sleep_time = (next_hour_utc - now_utc).total_seconds()
+    logging.info(f"Blinking {blink_hour} times to mark hour {blink_hour} AEST")
 
-        logging.info(f"Next blink scheduled for {next_hour_aest.strftime('%Y-%m-%d %H:%M:%S')} AEST (in {int(sleep_time)} seconds)")
-        time.sleep(sleep_time)
+    status_before = get_state(str(STATUS_LED_ID), "0000FF")
+    eyes_before = get_state(str(EYES_LED_ID), "0000FF")
+    blink_color = choose_blink_color(status_before, eyes_before)
+    logging.info(f"Blink color chosen: {blink_color}")
 
-        # After waking up, use the AEST hour for blink count
-        blink_hour = next_hour_aest.hour or 12
-        logging.info(f"Blinking {blink_hour} times to mark hour {blink_hour} AEST")
-
-        status_before = get_state(str(STATUS_LED_ID), "0000FF")
-        eyes_before = get_state(str(EYES_LED_ID), "0000FF")
-        blink_color = choose_blink_color(status_before, eyes_before)
-        logging.info(f"Blink color chosen: {blink_color}")
-
-        perform_hourly_blink(blink_hour, blink_color, status_before, eyes_before)
-
+    perform_hourly_blink(blink_hour, blink_color, status_before, eyes_before)
 
 def run_scheduler():
-    blink_thread = threading.Thread(target=blink_hourly_leds, args=(), daemon=True)
-    blink_thread.start()
+    logging.info("Starting scheduler loop")
+
+    # Schedule it to run every hour at :00
+    schedule.every().hour.at(":00").do(blink_hourly_leds)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
