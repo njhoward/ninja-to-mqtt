@@ -64,8 +64,8 @@ def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
 
 
 def blink_hourly_leds():
+    logging.info(f"blink_hourly_leds into method")    
     tz_aest = ZoneInfo(TIME_ZONE)
-
     while True:
         # Use AEST to determine the next AEST hour boundary
         now_aest = datetime.now(tz_aest)

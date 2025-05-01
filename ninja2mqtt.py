@@ -17,8 +17,9 @@ def main():
     mqtt_client = setup_mqtt()
 
     # Start the scheduler after mqtt is ready
-    scheduler_thread = threading.Thread(target=run_scheduler, args=(), daemon=True)
-    scheduler_thread.start()
+    #scheduler_thread = threading.Thread(target=run_scheduler, args=(), daemon=True)
+    #scheduler_thread.start()
+    run_scheduler()
 
     process_ninjacape_messages(mqtt_client)
 
