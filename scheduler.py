@@ -42,7 +42,7 @@ def choose_blink_color(status_color, eyes_color):
 
 def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
 
-    logging.info(f"[Debug] perform_hourly_blink - hour {hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
+    logging.info(f"[Scheduler] perform_hourly_blink - hour {hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
 
     send_led(STATUS_LED_ID, "000000")
     time.sleep(0.2)
@@ -61,26 +61,26 @@ def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
     send_led(STATUS_LED_ID, status_before)
     time.sleep(0.2)
     send_led(EYES_LED_ID, eyes_before)
-    logging.info("LED colors restored after blinking")
+    logging.info("[Scheduler] LED colors restored after blinking")
 
 
 def blink_hourly_leds():
-    logging.info(f"blink_hourly_leds into method")    
+    logging.info(f"[Scheduler] blink_hourly_leds into method")    
     tz_aest = ZoneInfo(TIME_ZONE)
     now_aest = datetime.now(tz_aest)
     blink_hour = now_aest.hour or 12
 
-    logging.info(f"Blinking {blink_hour} times to mark hour {blink_hour} AEST")
+    logging.info(f"[Scheduler] Blinking {blink_hour} times to mark hour {blink_hour} AEST")
 
     status_before = get_state(str(STATUS_LED_ID), "0000FF")
     eyes_before = get_state(str(EYES_LED_ID), "0000FF")
     blink_color = choose_blink_color(status_before, eyes_before)
-    logging.info(f"Blink color chosen: {blink_color}")
+    logging.info(f"[Scheduler] Blink color chosen: {blink_color}")
 
     perform_hourly_blink(blink_hour, blink_color, status_before, eyes_before)
 
 def run_scheduler():
-    logging.info("Starting scheduler loop")
+    logging.info("[Scheduler] Starting scheduler loop")
 
     # Schedule it to run every hour at :00
     schedule.every().hour.at(":00").do(blink_hourly_leds)
