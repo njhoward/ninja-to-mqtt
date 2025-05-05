@@ -30,7 +30,7 @@ def handle_debugs(mqttclient, topic, payload):
                 blink_color = choose_blink_color(status_before, eyes_before)
 
                 perform_blink(count, blink_color, status_before, eyes_before)
-                logging.info(f"Manually triggered blink for {hour} o'clock")
+                logging.info(f"Manually triggered blink for {count} o'clock")
         except Exception as e:
             logging.error(f"Failed to trigger manual blink: {e}")
         return f"[Debug] Blink triggered for {count} blinks"  # or return True
