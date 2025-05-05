@@ -1,3 +1,4 @@
+# utils.py
 import re
 import logging
 
@@ -28,3 +29,11 @@ def hex_to_rgb_string(hex_color):
         b = int(hex_color[4:6], 16)
         return f"{r},{g},{b}"
     return hex_color  # Return the original value if not valid hex RGB
+
+def is_int(s):
+    """Returns True if s is a string that can be converted to an int."""
+    try:
+        int(s)
+        return True
+    except (ValueError, TypeError):
+        return False

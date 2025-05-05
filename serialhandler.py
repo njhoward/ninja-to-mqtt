@@ -9,6 +9,7 @@ from rfhandler import parse_sensor_data
 from rfhandler import log_if_suspicious_rf
 from config import STATUS_LED_ID, EYES_LED_ID
 from statehandler import set_state
+from utils import is_int
 
 ser = None
 
@@ -68,7 +69,7 @@ def process_ninjacape_messages(mqtt_client):
                 dev_value = str(dev["DA"])
 
                 #convert to rgb if ninja status (999) or rgb (1007) led's
-                if dev_id in {STATUS_LED_ID, EYES_LED_ID}:
+                if is_int(dev_id) and int(dev_id) in {STATUS_LED_ID, EYES_LED_ID}:
                     dev_value = hex_to_rgb_string(dev_value)
 
                 #logging.debug(f"Dev_ID: {dev_id}, protocol: {protocol}")
@@ -116,7 +117,7 @@ def process_ninjacape_messages(mqtt_client):
 
 
                 #Eye and Status LED specific logic
-                if dev_id in {STATUS_LED_ID, EYES_LED_ID}:
+                if is_int(dev_value) and int(dev_id) in {STATUS_LED_ID, EYES_LED_ID}:
                     logging.debug(f"Published dev_id: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
                     on_value = "true"
