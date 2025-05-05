@@ -117,7 +117,7 @@ def process_ninjacape_messages(mqtt_client):
 
 
                 #Eye and Status LED specific logic
-                if is_int(dev_value) and int(dev_id) in {STATUS_LED_ID, EYES_LED_ID}:
+                if is_int(dev_id) and int(dev_id) in {STATUS_LED_ID, EYES_LED_ID}:
                     logging.debug(f"Published dev_id: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
                     on_value = "true"
