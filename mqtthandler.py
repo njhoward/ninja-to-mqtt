@@ -106,7 +106,7 @@ def publish_payload(client, topic, payload, dev_id=None):
         dev_id = None
 
     if dev_id in THROTTLED_IDS:
-        logging.info(f"[MQTTHandler] [THROTTLE] Checking {dev_id=} {topic=} {payload=}")
+        logging.debug(f"[MQTTHandler] [THROTTLE] Checking {dev_id=} {topic=} {payload=}")
         now = time.time()
         cache_key = (dev_id, topic)  # 🔄 Cache key uses dev_id AND topic
         last_entry = recent_publishes.get(cache_key)
@@ -115,11 +115,11 @@ def publish_payload(client, topic, payload, dev_id=None):
             last_time = last_entry["timestamp"]
             last_value = last_entry["payload"]
             if last_value == payload and now - last_time < THROTTLE_SECONDS:
-                logging.info(f"[MQTTHandler] [THROTTLE] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
+                logging.debug(f"[MQTTHandler] [THROTTLE] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
                 return
 
         recent_publishes[cache_key] = {"timestamp": now, "payload": payload}
 
     client.publish(topic, payload)
     logging.info(f"[MQTTHandler] Published: {topic} -> {payload}")
-    logging.info(f"[MQTTHandler] [THROTTLE] publish_payload Final]")
+    
