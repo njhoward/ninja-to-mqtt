@@ -40,15 +40,15 @@ def choose_blink_color(status_color, eyes_color):
     return random.choice(available_colors or VALID_LED_COLORS)
 
 
-def perform_hourly_blink(hour, blink_color, status_before, eyes_before):
+def perform_blink(count, blink_color, status_before, eyes_before):
 
-    logging.info(f"[Scheduler] perform_hourly_blink - hour {hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
+    logging.info(f"[Scheduler] perform_hourly_blink - hour {count}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
 
     send_led(STATUS_LED_ID, "000000")
     time.sleep(0.2)
     send_led(EYES_LED_ID, "000000")
     time.sleep(2)
-    for _ in range(hour):
+    for _ in range(count):
         send_led(STATUS_LED_ID, blink_color)
         time.sleep(0.2)
         send_led(EYES_LED_ID, blink_color)
@@ -77,13 +77,28 @@ def blink_hourly_leds():
     blink_color = choose_blink_color(status_before, eyes_before)
     logging.info(f"[Scheduler] Blink color chosen: {blink_color}")
 
-    perform_hourly_blink(blink_hour, blink_color, status_before, eyes_before)
+    logging.info(f"[Scheduler] blink_hourly_leds - hour {blink_hour}, blink_color {blink_color}, status_before {status_before}, eyes_before {eyes_before}")
+    perform_blink(blink_hour, blink_color, status_before, eyes_before)
+
+
+def blink_half_hour_beep():
+    logging.info("[Scheduler] blink_half_hour_beep into method")
+
+    status_before = get_state(str(STATUS_LED_ID), "0000FF")
+    eyes_before = get_state(str(EYES_LED_ID), "0000FF")
+    blink_color = choose_blink_color(status_before, eyes_before)
+    
+    perform_blink(1, blink_color, eyes_before, blink_color)
+
+    logging.info(f"[Scheduler] Half-hour beep color: {blink_color}")
+
 
 def run_scheduler():
     logging.info("[Scheduler] Starting scheduler loop")
 
     # Schedule it to run every hour at :00
     schedule.every().hour.at(":00").do(blink_hourly_leds)
+    schedule.every().hour.at(":30").do(blink_half_hour_beep)
 
     while True:
         schedule.run_pending()
