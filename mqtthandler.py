@@ -113,15 +113,7 @@ def publish_payload(client, topic, payload, dev_id=None):
 
         if last_entry:
             last_time = last_entry["timestamp"]
-            logging.info(f"[THROTTLE] last_entry: {last_entry}")
             last_value = last_entry["payload"]
-            logging.info(f"[THROTTLE] last_value: {last_value}")
-
-            logging.info(f"[THROTTLE] payload: {payload}")
-            logging.info(f"[THROTTLE] last_value == payload: {last_value == payload}")
-            logging.info(f"[THROTTLE] now - last_time: {now - last_time}")
-
-
             if last_value == payload and now - last_time < THROTTLE_SECONDS:
                 logging.info(f"[MQTTHandler] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
                 return
@@ -130,3 +122,4 @@ def publish_payload(client, topic, payload, dev_id=None):
 
     client.publish(topic, payload)
     logging.info(f"Published: {topic} -> {payload}")
+    logging.info(f"[THROTTLE publish_payload Final]")
