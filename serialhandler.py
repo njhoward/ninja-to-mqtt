@@ -92,19 +92,21 @@ def process_ninjacape_messages(mqtt_client):
                             temp = result["temperature"]
                             hum = result["humidity"]
 
-                            mqtt_client.publish("ninjaCape/input/31", temp)
+                            #mqtt_client.publish("ninjaCape/input/31", temp)
+                            publish_to_mqtt("ninjaCape/input/31", temp, dev_id=31)
                             #current_states["31"] = temp
                             set_state("31", temp)
-                            logging.info(f"Published: 31 -> {temp} (temperature)")
+                            logging.debug(f"[MQTTHandler] Published: (11/5) 31 -> {temp} (temperature)")
 
-                            mqtt_client.publish("ninjaCape/input/30", hum)
+                            publish_to_mqtt("ninjaCape/input/30", temp, dev_id=30)
+                            #mqtt_client.publish("ninjaCape/input/30", hum)
                             #current_states["30"] = hum
                             set_state("30", hum)
-                            logging.info(f"Published: 30 -> {hum} (humidity)")
+                            logging.debug(f"[MQTTHandler] Published: (11/5) 30 -> {hum} (humidity)")
                             #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
                             continue  # Skip default publish for dev_id=11 if handled above
                         else:
-                            logging.info(f"Unrecognized or non-temperature protocol 5 data: {dev_value} "
+                            logging.info(f"[MQTTHandler] Unrecognized or non-temperature protocol 5 data: {dev_value} "
                                         f"(Reason: {result.get('reason')})")
                 
                 # Publish received sensor data to MQTT
@@ -115,17 +117,17 @@ def process_ninjacape_messages(mqtt_client):
 
                 #Eye and Status LED specific logic
                 if dev_id in {STATUS_LED_ID, EYES_LED_ID}:
-                    logging.debug(f"Published: {dev_id} -> {dev_value}")
+                    logging.debug(f"Published dev_id: {dev_id} -> {dev_value}")
                     # specific on / off for LED's
                     on_value = "true"
                     if dev_value == "0,0,0":
                         on_value = "false"
                     publish_to_mqtt(mqtt_client, f"ninjaCape/input/{dev_id}/on", on_value, dev_id=dev_id)
-                    logging.debug(f"Published On: {dev_id} -> {on_value}")
+                    logging.debug(f"Published On dev_id: {dev_id} -> {on_value}")
                 else:
                     # log and notify if anything other than 999 or 1007
-                    logging.info(f"Published: {dev_id} -> {dev_value}")
-                    send_notification(f"Published: {dev_id} -> {dev_value}")
+                    logging.info(f"Published Else: {dev_id} -> {dev_value}")
+                    send_notification(f"Published Else: {dev_id} -> {dev_value}")
 
             else:
                 logging.warning(f"Unknown format: {line}")

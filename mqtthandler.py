@@ -24,11 +24,11 @@ def setup_mqtt():
 
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
-            logging.info("Connected to MQTT broker")
+            logging.info("[MQTTHandler] Connected to MQTT broker")
             client.subscribe("ninjaCape/output/#")
             client.subscribe("ninjaCape/debug/#")
         else:
-            logging.error(f"MQTT connection failed with code {rc}")
+            logging.error(f"[MQTTHandler] MQTT connection failed with code {rc}")
 
     def on_message(client, userdata, msg):
         payload = msg.payload.decode()
@@ -44,7 +44,7 @@ def setup_mqtt():
                 return
 
             if topic == "ninjaCape/output":
-                logging.debug("Received ninjaCape/output root message — ignoring.")
+                logging.debug("[MQTTHandler] Received ninjaCape/output root message — ignoring.")
                 return
             
             if topic.startswith("ninjaCape/debug/"):
@@ -85,8 +85,8 @@ def setup_mqtt():
 
 
         except Exception as e:
-            logging.error(f"Error processing MQTT message: {e}")
-            send_notification(f"MQTT processing error: {e}")
+            logging.error(f"[MQTTHandler] Error processing MQTT message: {e}")
+            send_notification(f"[MQTTHandler] MQTT processing error: {e}")
 
     client.on_connect = on_connect
     client.on_message = on_message
@@ -106,7 +106,7 @@ def publish_payload(client, topic, payload, dev_id=None):
         dev_id = None
 
     if dev_id in THROTTLED_IDS:
-        logging.info(f"[THROTTLE] Checking {dev_id=} {topic=} {payload=}")
+        logging.info(f"[MQTTHandler] [THROTTLE] Checking {dev_id=} {topic=} {payload=}")
         now = time.time()
         cache_key = (dev_id, topic)  # 🔄 Cache key uses dev_id AND topic
         last_entry = recent_publishes.get(cache_key)
@@ -115,11 +115,11 @@ def publish_payload(client, topic, payload, dev_id=None):
             last_time = last_entry["timestamp"]
             last_value = last_entry["payload"]
             if last_value == payload and now - last_time < THROTTLE_SECONDS:
-                logging.info(f"[MQTTHandler] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
+                logging.info(f"[MQTTHandler] [THROTTLE] Throttled publish for {topic} (dev_id={dev_id}, unchanged, <5m)")
                 return
 
         recent_publishes[cache_key] = {"timestamp": now, "payload": payload}
 
     client.publish(topic, payload)
-    logging.info(f"Published: {topic} -> {payload}")
-    logging.info(f"[THROTTLE publish_payload Final]")
+    logging.info(f"[MQTTHandler] Published: {topic} -> {payload}")
+    logging.info(f"[MQTTHandler] [THROTTLE] publish_payload Final]")
