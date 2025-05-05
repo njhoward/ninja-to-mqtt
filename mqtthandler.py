@@ -100,6 +100,8 @@ def publish_payload(client, topic, payload, dev_id=None):
     Publish to MQTT, applying throttling logic for specific dev_ids.
     """
 
+    logging.info(f"[THROTTLE] publish_payload Entry")
+
     try:
         dev_id = int(dev_id)
     except (TypeError, ValueError):
