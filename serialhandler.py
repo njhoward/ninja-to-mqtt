@@ -94,12 +94,12 @@ def process_ninjacape_messages(mqtt_client):
                             hum = result["humidity"]
 
                             #mqtt_client.publish("ninjaCape/input/31", temp)
-                            publish_to_mqtt("ninjaCape/input/31", temp, dev_id=31)
+                            publish_to_mqtt(mqtt_client, "ninjaCape/input/31", temp, dev_id=31)
                             #current_states["31"] = temp
                             set_state("31", temp)
                             logging.debug(f"[MQTTHandler] Published: (11/5) 31 -> {temp} (temperature)")
 
-                            publish_to_mqtt("ninjaCape/input/30", temp, dev_id=30)
+                            publish_to_mqtt(mqtt_client, "ninjaCape/input/30", temp, dev_id=30)
                             #mqtt_client.publish("ninjaCape/input/30", hum)
                             #current_states["30"] = hum
                             set_state("30", hum)
