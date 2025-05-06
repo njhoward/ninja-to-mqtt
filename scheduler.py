@@ -93,7 +93,7 @@ def blink_half_hour_beep():
     eyes_before = convert_to_hex(eyes_rgb) or "0000FF"
     blink_color = choose_blink_color(status_before, eyes_before)
     
-    perform_blink(1, blink_color, eyes_before, blink_color)
+    perform_blink(1, blink_color, status_before, eyes_before)
 
     logging.info(f"[Scheduler] Half-hour beep color: {blink_color}")
 
