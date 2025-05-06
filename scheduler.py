@@ -10,6 +10,7 @@ from zoneinfo import ZoneInfo
 from config import STATUS_LED_ID, EYES_LED_ID, TIME_ZONE
 from serialhandler import send_ninjacape_messages
 from statehandler import get_state
+from utils import convert_to_hex
 
 VALID_LED_COLORS = [
     "FF0000", "00FF00", "0000FF",
@@ -72,8 +73,10 @@ def blink_hourly_leds():
 
     logging.info(f"[Scheduler] Blinking {blink_hour} times to mark hour {blink_hour} AEST")
 
-    status_before = get_state(str(STATUS_LED_ID), "0000FF")
-    eyes_before = get_state(str(EYES_LED_ID), "0000FF")
+    status_rgb = get_state(str(STATUS_LED_ID), "0,0,255")
+    eyes_rgb = get_state(str(EYES_LED_ID), "0,0,255")
+    status_before = convert_to_hex(status_rgb) or "0000FF"
+    eyes_before = convert_to_hex(eyes_rgb) or "0000FF"
     blink_color = choose_blink_color(status_before, eyes_before)
     logging.info(f"[Scheduler] Blink color chosen: {blink_color}")
 
@@ -84,8 +87,10 @@ def blink_hourly_leds():
 def blink_half_hour_beep():
     logging.info("[Scheduler] blink_half_hour_beep into method")
 
-    status_before = get_state(str(STATUS_LED_ID), "0000FF")
-    eyes_before = get_state(str(EYES_LED_ID), "0000FF")
+    status_rgb = get_state(str(STATUS_LED_ID), "0,0,255")
+    eyes_rgb = get_state(str(EYES_LED_ID), "0,0,255")
+    status_before = convert_to_hex(status_rgb) or "0000FF"
+    eyes_before = convert_to_hex(eyes_rgb) or "0000FF"
     blink_color = choose_blink_color(status_before, eyes_before)
     
     perform_blink(1, blink_color, eyes_before, blink_color)
