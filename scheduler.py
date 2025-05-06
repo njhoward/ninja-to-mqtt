@@ -92,15 +92,29 @@ def blink_half_hour_beep():
 
     logging.info(f"[Scheduler] Half-hour beep color: {blink_color}")
 
+def safe_blink_hourly_leds():
+    try:
+        blink_hourly_leds()
+    except Exception as e:
+        logging.error(f"[Scheduler] Error in blink_hourly_leds: {e}")
+        logging.exception("[Scheduler] Exception details:")
+
+def safe_blink_half_hour_beep():
+    try:
+        blink_half_hour_beep()
+    except Exception as e:
+        logging.error(f"[Scheduler] Error in blink_half_hour_beep: {e}")
+        logging.exception("[Scheduler] Exception details:")
+
 
 def run_scheduler():
     logging.info("[Scheduler] Starting scheduler loop")
 
-    # Schedule it to run every hour at :00
-    schedule.every().hour.at(":00").do(blink_hourly_leds)
-    schedule.every().hour.at(":30").do(blink_half_hour_beep)
+    schedule.every().hour.at(":00").do(safe_blink_hourly_leds)
+    schedule.every().hour.at(":30").do(safe_blink_half_hour_beep)
 
     while True:
         schedule.run_pending()
         time.sleep(1)
+
 

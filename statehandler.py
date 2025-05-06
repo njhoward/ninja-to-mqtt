@@ -9,9 +9,9 @@ def set_state(key: str, value):
     with _lock:
         current_states[key] = value
 
-def get_state(key: str):
+def get_state(key: str, default=None):
     with _lock:
-        return current_states.get(key)
+        return current_states.get(key, default)
 
 def get_all_states():
     with _lock:
