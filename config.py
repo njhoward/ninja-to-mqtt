@@ -12,8 +12,11 @@ SERIAL_TIMEOUT = 5  # Timeout for serial read to prevent blocking
 STATUS_LED_ID = 999
 EYES_LED_ID = 1007
 
-#
+#time zone
 TIME_ZONE = "Australia/Melbourne"
+
+#shelving location
+SHELF_PATH = '/home/debian/db/ninja2mqtt_state.db'
 
 # PUSHOVER config - retrieved from environment varables
 PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY")

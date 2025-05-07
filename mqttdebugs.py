@@ -4,6 +4,7 @@ import time
 from config import STATUS_LED_ID, EYES_LED_ID
 from scheduler import perform_blink, choose_blink_color, send_led
 from statehandler import get_all_states, current_states
+from persisthandler import get_all_persisted_states
 
 def handle_debugs(mqttclient, topic, payload):
     
@@ -13,6 +14,13 @@ def handle_debugs(mqttclient, topic, payload):
         for key, value in state_snapshot.items():
             logging.info(f"  {key}: {value}")
         return f"[Debug] States"  # or return True
+    
+    if topic == "ninjaCape/debug/shelf":
+        shelf_snapshot = get_all_persisted_states()
+        logging.info("Current shelf dump requested via MQTT:")
+        for key, value in shelf_snapshot.items():
+            logging.info(f"  {key}: {value}")
+        return f"[Debug] Shelf"  # or return True
 
     if topic.startswith("ninjaCape/debug/blink"):
         try:

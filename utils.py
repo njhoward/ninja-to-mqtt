@@ -1,6 +1,8 @@
 # utils.py
 import re
 import logging
+from zoneinfo import ZoneInfo
+from datetime import datetime
 
 
 def convert_to_hex(value):
@@ -37,3 +39,9 @@ def is_int(s):
         return True
     except (ValueError, TypeError):
         return False
+
+def timezone_convert(timezone_from, timezone_to, hour=0, minute=0, second=0, microsecond=0):
+    orig_time = datetime.now(ZoneInfo(timezone_from)).replace(hour, minute, second, microsecond)
+    target_time = orig_time.astimezone(ZoneInfo(timezone_to))
+    return target_time
+
