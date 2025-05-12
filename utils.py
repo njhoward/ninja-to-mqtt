@@ -40,8 +40,7 @@ def is_int(s):
     except (ValueError, TypeError):
         return False
 
-def timezone_convert(timezone_from, timezone_to, hour=0, minute=0, second=0, microsecond=0):
-    orig_time = datetime.now(ZoneInfo(timezone_from)).replace(hour, minute, second, microsecond)
-    target_time = orig_time.astimezone(ZoneInfo(timezone_to))
-    return target_time
+def timezone_convert(timezone_from, timezone_to, hour, minute):
+    orig_time = datetime.now(ZoneInfo(timezone_from)).replace(hour=hour, minute=minute, second=0, microsecond=0)
+    return orig_time.astimezone(ZoneInfo(timezone_to))
 
