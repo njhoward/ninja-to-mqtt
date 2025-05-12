@@ -152,25 +152,33 @@ def turn_leds_on():
         logging.exception("[Scheduler] Exception details:")
 
 def run_scheduler():
-    logging.info("[Scheduler] Starting scheduler loop")
+    try:
+        logging.info("[Scheduler] Starting scheduler loop")
 
-    turn_leds_on()
+        turn_leds_on()
 
-    schedule.every().hour.at(":00").do(safe_blink_hourly_leds)
-    schedule.every().hour.at(":30").do(safe_blink_half_hour_beep)
+        schedule.every().hour.at(":00").do(safe_blink_hourly_leds)
+        schedule.every().hour.at(":30").do(safe_blink_half_hour_beep)
 
-    utc_time = timezone_convert(TIME_ZONE, "UTC", 22, 31)
-    utc_str = utc_time.strftime("%H:%M")
-    logging.info(f"[Scheduler] Off Set for {utc_str} UTC")
-    schedule.every().day.at(utc_str).do(turn_leds_off)
+        utc_time = timezone_convert(TIME_ZONE, "UTC", 22, 31)
+        utc_str = utc_time.strftime("%H:%M")
+        logging.info(f"[Scheduler] Off Set for {utc_str} UTC")
+        schedule.every().day.at(utc_str).do(turn_leds_off)
 
-    utc_time = timezone_convert(TIME_ZONE, "UTC", 7, 31)
-    utc_str = utc_time.strftime("%H:%M")
-    logging.info(f"[Scheduler] On Set for {utc_str} UTC")
-    schedule.every().day.at(utc_str).do(turn_leds_on)
+        utc_time = timezone_convert(TIME_ZONE, "UTC", 7, 31)
+        utc_str = utc_time.strftime("%H:%M")
+        logging.info(f"[Scheduler] On Set for {utc_str} UTC")
+        schedule.every().day.at(utc_str).do(turn_leds_on)
 
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+        while True:
+            try:
+                schedule.run_pending()
+            except Exception as e:
+                logging.error(f"[Scheduler] Error running scheduled tasks: {e}")
+                logging.exception("[Scheduler] Exception in scheduler loop")
+            time.sleep(1)
+    except Exception as e:
+        logging.error(f"[Scheduler] Fatal error in run_scheduler: {e}")
+        logging.exception("[Scheduler] Exception details at startup or setup")
 
 
