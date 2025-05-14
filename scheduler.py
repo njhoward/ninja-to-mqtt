@@ -131,7 +131,7 @@ def turn_leds_off():
         send_led(STATUS_LED_ID, "000000")
         time.sleep(0.1)
         send_led(EYES_LED_ID, "000000")
-
+        logging.info("[Scheduler] LEDs Turned Off")
     except Exception as e:
         logging.error(f"[Scheduler] Error in turn_leds_off: {e}")
         logging.exception("[Scheduler] Exception details:")
@@ -146,7 +146,7 @@ def turn_leds_on():
         send_led(STATUS_LED_ID, status_before)
         time.sleep(0.1)
         send_led(EYES_LED_ID, eyes_before)
-
+        logging.info("[Scheduler] LEDs Turned On")
     except Exception as e:
         logging.error(f"[Scheduler] Error in turn_leds_on: {e}")
         logging.exception("[Scheduler] Exception details:")
