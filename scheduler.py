@@ -125,8 +125,8 @@ def turn_leds_off():
         set_persisted_state(LEDSLEEP, "1")
         status_rgb = get_state(str(STATUS_LED_ID), "0,0,255")
         eyes_rgb = get_state(str(EYES_LED_ID), "0,0,255")
-        set_persisted_state(STATUS_LED_ID, status_rgb)
-        set_persisted_state(EYES_LED_ID, eyes_rgb)
+        set_persisted_state(str(STATUS_LED_ID), status_rgb)
+        set_persisted_state(str(EYES_LED_ID), eyes_rgb)
 
         send_led(STATUS_LED_ID, "000000")
         time.sleep(0.1)
