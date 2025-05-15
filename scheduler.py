@@ -129,7 +129,7 @@ def turn_leds_off():
         set_persisted_state(str(EYES_LED_ID), eyes_rgb)
 
         send_led(STATUS_LED_ID, "000000")
-        time.sleep(0.1)
+        time.sleep(0.2)
         send_led(EYES_LED_ID, "000000")
         logging.info("[Scheduler] LEDs Turned Off")
     except Exception as e:
@@ -144,7 +144,7 @@ def turn_leds_on():
         status_before = convert_to_hex(status_rgb) or "0000FF"
         eyes_before = convert_to_hex(eyes_rgb) or "0000FF"
         send_led(STATUS_LED_ID, status_before)
-        time.sleep(0.1)
+        time.sleep(0.2)
         send_led(EYES_LED_ID, eyes_before)
         logging.info("[Scheduler] LEDs Turned On")
     except Exception as e:
