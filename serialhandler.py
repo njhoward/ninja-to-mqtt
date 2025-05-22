@@ -9,6 +9,7 @@ from rfhandler import parse_sensor_data
 from rfhandler import log_if_suspicious_rf
 from config import STATUS_LED_ID, EYES_LED_ID
 from statehandler import set_state
+from influxhandler import log_reading
 from utils import is_int
 
 ser = None
@@ -93,18 +94,18 @@ def process_ninjacape_messages(mqtt_client):
                             temp = result["temperature"]
                             hum = result["humidity"]
 
-                            #mqtt_client.publish("ninjaCape/input/31", temp)
+
                             publish_to_mqtt(mqtt_client, "ninjaCape/input/31", temp, dev_id=31)
-                            #current_states["31"] = temp
                             set_state("31", temp)
                             logging.debug(f"[MQTTHandler] Published: (11/5) 31 -> {temp} (temperature)")
 
                             publish_to_mqtt(mqtt_client, "ninjaCape/input/30", hum, dev_id=30)
-                            #mqtt_client.publish("ninjaCape/input/30", hum)
-                            #current_states["30"] = hum
                             set_state("30", hum)
                             logging.debug(f"[MQTTHandler] Published: (11/5) 30 -> {hum} (humidity)")
-                            #send_notification(f"Published: 31 -> {temp}°C, 30 -> {hum}%")
+
+                            #log to influx
+                            log_reading("ninja", 3130, result.get('station'), temp, hum)
+
                             continue  # Skip default publish for dev_id=11 if handled above
                         else:
                             logging.info(f"[MQTTHandler] Unrecognized or non-temperature protocol 5 data: {dev_value} "

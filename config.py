@@ -21,3 +21,8 @@ SHELF_PATH = '/home/debian/db/ninja2mqtt_state.db'
 # PUSHOVER config - retrieved from environment varables
 PUSHOVER_USER_KEY = os.getenv("PUSHOVER_USER_KEY")
 PUSHOVER_API_TOKEN = os.getenv("PUSHOVER_API_TOKEN")
+
+#influx config
+INFLUX_HOST = "raspberrypi"
+INFLUX_PORT = 8086
+INFLUX_DB = "weather_data"
